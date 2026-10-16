@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10182f">
+  <title>チャレンジ大会 エントリー確認</title>
+  <style>
+    :root{--bg:#10182f;--panel:#182442;--panel2:#202f52;--text:#f4f8ff;--muted:#afbdd7;--accent:#00c4ff;--gold:#ffd766;--line:#30436c;--women:#ffadd8;--men:#9ceaff}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;min-height:100vh;-webkit-text-size-adjust:100%}
+    main{width:min(820px,100%);margin:auto;padding:calc(16px + env(safe-area-inset-top)) 16px 32px}
+    .eyebrow{color:var(--accent);font-size:11px;font-weight:800}
+    .heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:5px 0 6px}
+    h1{font-size:25px;line-height:1.25;margin:0}
+    .date{font-size:13px;color:#d9efff;font-weight:800}
+    .date b{color:var(--accent)}
+    .summary{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+    .schedule{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 0}
+    .slot{padding:10px 11px;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+    .slot small{display:block;color:var(--accent);font-size:11px;font-weight:800}
+    .slot strong{display:block;margin-top:3px;font-size:15px;font-variant-numeric:tabular-nums}
+    .slot span{display:block;margin-top:3px;color:var(--muted);font-size:12px;line-height:1.5;font-variant-numeric:tabular-nums}
+    .groups{margin:7px 0 0;color:var(--muted);font-size:11px;line-height:1.55}
+    .notice{margin:12px 0 0;padding:10px 12px;border:1px solid #9d813a;border-radius:7px;background:#1b2a49;font-size:13px;line-height:1.55;color:#f0e2b1}
+    .notice b{color:var(--gold)}
+    .notice a{color:#ffe79a;overflow-wrap:anywhere}
+    .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:16px 0 0;border:1px solid #405782;border-radius:7px;overflow:hidden}
+    .tab{min-height:44px;border:0;border-right:1px solid #405782;background:var(--panel);color:#cfdaee;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+    .tab:last-child{border-right:0}
+    .tab[aria-selected="true"]{background:#0b3650;color:#fff;box-shadow:inset 0 -3px 0 var(--accent)}
+    .controls{position:sticky;top:env(safe-area-inset-top);z-index:3;margin:0 -4px;padding:9px 4px;background:#10182ff5;border-bottom:1px solid var(--line)}
+    input,select{width:100%;min-width:0;min-height:46px;border:1px solid #405782;border-radius:6px;background:#0d1730;color:var(--text);font:inherit;font-size:16px;padding:10px 12px}
+    input:focus,select:focus{outline:2px solid #00c4ff88;outline-offset:1px}
+    .control-row{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:8px}
+    .filters{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+    .filter{min-height:38px;border:1px solid #405782;border-radius:6px;background:var(--panel);color:#e3ecfb;padding:6px 11px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+    .filter[aria-pressed="true"]{border-color:var(--accent);background:#0b3650;color:#fff}
+    .chips{display:flex;gap:7px;overflow-x:auto;margin-top:8px;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .chips::-webkit-scrollbar{display:none}
+    .chips .filter{flex:none;white-space:nowrap}
+    .chips .filter small{color:var(--muted);font-weight:600;margin-left:4px}
+    .status{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:13px 0 8px;color:var(--muted);font-size:12px}
+    .status strong{color:var(--text);font-size:15px}
+    .team-note{margin:-2px 0 9px;padding:8px 10px;border-left:3px solid var(--accent);background:var(--panel);font-size:12px;line-height:1.5;color:#d1ddef}
+    .team-note:empty{display:none}
+    .list{display:grid;gap:7px}
+    .person{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;padding:11px 12px;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+    .person-main{min-width:0}
+    .name{font-size:17px;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
+    .kana{color:#aebbd5;font-size:11px;font-weight:500;margin-left:5px}
+    .meta{margin-top:3px;color:var(--muted);font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+    .gender{align-self:start;border:1px solid #64dfff66;border-radius:4px;padding:4px 7px;color:var(--men);font-size:11px;font-weight:800;white-space:nowrap}
+    .gender.women{border-color:#ff8ccf66;color:var(--women)}
+    .races{grid-column:1/-1;display:grid;gap:5px}
+    .race{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;background:var(--panel2);font-size:13px}
+    .race .ev{font-weight:800}
+    .cls{padding:1px 6px;border:1px solid #405782;border-radius:4px;color:#dbe6f8;font-size:11px;font-weight:700;white-space:nowrap}
+    .race .time{margin-left:auto;color:var(--accent);font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .group-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:16px 0 7px;padding-bottom:6px;border-bottom:2px solid var(--line);font-size:15px;font-weight:800}
+    .group-title:first-child{margin-top:4px}
+    .group-title.men{border-color:#64dfff88}
+    .group-title.women{border-color:#ff8ccf88}
+    .group-title small{color:var(--muted);font-size:12px;font-weight:700;white-space:nowrap}
+    .rank-list{display:grid;gap:5px}
+    .rank{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+    .rank .pos{color:var(--muted);font-size:12px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+    .rank .who{min-width:0}
+    .rank .who strong{display:block;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+    .rank .who span{display:block;color:var(--muted);font-size:11px;line-height:1.45;overflow-wrap:anywhere}
+    .rank .time{color:var(--accent);font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
+    .matrix-wrap{margin-top:20px;padding-top:13px;border-top:1px solid var(--line)}
+    h2{font-size:16px;line-height:1.35;margin:0 0 8px}
+    .matrix{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+    .matrix th,.matrix td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:center}
+    .matrix th{color:var(--muted);font-weight:700;font-size:11px}
+    .matrix th:first-child,.matrix td:first-child{text-align:left;padding-left:2px}
+    .matrix td button{min-width:34px;min-height:30px;border:0;border-radius:4px;background:var(--panel2);color:var(--text);font:inherit;font-weight:800;cursor:pointer}
+    .matrix td button:disabled{background:none;color:#5c6d8f;cursor:default}
+    .empty{padding:24px 10px;text-align:center;color:var(--muted);border:1px dashed #405782;border-radius:7px}
+    [hidden]{display:none!important}
+    .meet-info{margin-top:20px;padding-top:13px;border-top:1px solid var(--line)}
+    .meet-info p{margin:5px 0;color:#d1ddef;font-size:12px;line-height:1.55}
+    .warning{padding:9px 10px;border-left:3px solid var(--gold);background:#1b2944;color:#f0e2b1!important}
+    details{margin-top:9px;color:var(--muted);font-size:12px}
+    summary{min-height:40px;display:flex;align-items:center;cursor:pointer;color:#dbe6f8;font-weight:700}
+    .source-links{display:flex;flex-wrap:wrap;gap:8px 14px;padding:4px 0 2px}
+    a{color:var(--accent)}
+    footer{margin-top:15px;color:var(--muted);font-size:11px;line-height:1.55}
+    @media(max-width:560px){main{padding-left:12px;padding-right:12px}.slot{padding:8px}.slot strong{font-size:14px}.slot span{font-size:11px}}
+    @media(max-width:350px){main{padding-left:10px;padding-right:10px}h1{font-size:21px}.schedule{grid-template-columns:1fr}.control-row{grid-template-columns:minmax(0,1fr) 108px}.filter{padding:6px 9px}.name{font-size:16px}.person{padding:10px}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">KAGOSHIMA SWIMMING CLUB · CHALLENGE MEET 2026</div>
+    <div class="heading"><h1>チャレンジ大会 エントリー確認</h1><div class="date"><b>11月8日(日)</b> 鴨池公園プール</div></div>
+    <p class="summary">第258回 鹿児島県スイミングクラブ水泳競技大会（チャレンジ大会）　|　屋内 25m×8レーン・全種目タイムレース決勝</p>
+    <div class="schedule">
+      <div class="slot"><small>開門</small><strong>A 8:30</strong><span>B 8:50</span></div>
+      <div class="slot"><small>アップ</small><strong>A 8:40〜9:10</strong><span>B 9:00〜9:30</span></div>
+      <div class="slot"><small>開会式・競技開始</small><strong>9:45</strong><span>競技 10:00〜</span></div>
+    </div>
+    <p class="groups">A＝原田学園SS・ジェル鹿児島以外のチーム　B＝原田学園SS・ジェル鹿児島（参加人数により変わることがあります。二次要項で確認してください）</p>
+    <p class="notice"><b>まちがいの連絡は 10月20日(火) 20:00 まで</b><br>記録担当 堂薗さんへメールで → <a href="mailto:gfwdzono826@yahoo.co.jp">gfwdzono826@yahoo.co.jp</a></p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="表示の切り替え">
+    <button type="button" class="tab" role="tab" id="tab-people" aria-controls="panel-people" aria-selected="true">選手・チーム</button>
+    <button type="button" class="tab" role="tab" id="tab-events" aria-controls="panel-events" aria-selected="false">種目</button>
+    <button type="button" class="tab" role="tab" id="tab-relays" aria-controls="panel-relays" aria-selected="false">リレー</button>
+  </div>
+
+  <section id="panel-people" role="tabpanel" aria-labelledby="tab-people">
+    <div class="controls">
+      <div class="control-row">
+        <input id="query" type="search" autocomplete="off" placeholder="名前・よみ・チーム" aria-label="選手名、よみ、チームで検索">
+        <select id="cls" class="cls-select" aria-label="区分"></select>
+      </div>
+      <div class="filters" role="group" aria-label="性別">
+        <button type="button" class="filter" data-gender="all" aria-pressed="true">全員</button>
+        <button type="button" class="filter" data-gender="男子" aria-pressed="false">男子</button>
+        <button type="button" class="filter" data-gender="女子" aria-pressed="false">女子</button>
+      </div>
+      <div class="chips" id="team-chips" role="group" aria-label="チーム"></div>
+    </div>
+    <div class="status" aria-live="polite"><span><strong id="people-count">-</strong>名</span><span><strong id="entry-count">-</strong>種目</span></div>
+    <p class="team-note" id="team-note"></p>
+    <div id="people" class="list" aria-label="選手エントリー一覧"></div>
+  </section>
+
+  <section id="panel-events" role="tabpanel" aria-labelledby="tab-events" hidden>
+    <div class="controls">
+      <div class="control-row">
+        <select id="event" aria-label="種目"></select>
+        <select id="ecls" class="cls-select" aria-label="区分"></select>
+      </div>
+      <div class="filters" role="group" aria-label="性別">
+        <button type="button" class="filter" data-egender="all" aria-pressed="true">全員</button>
+        <button type="button" class="filter" data-egender="男子" aria-pressed="false">男子</button>
+        <button type="button" class="filter" data-egender="女子" aria-pressed="false">女子</button>
+      </div>
+    </div>
+    <div class="status" aria-live="polite"><span id="event-label"></span><span><strong id="event-count">-</strong>名</span></div>
+    <div id="event-list"></div>
+    <section class="matrix-wrap" aria-labelledby="matrix-title">
+      <h2 id="matrix-title">種目・区分ごとの人数</h2>
+      <table class="matrix" id="matrix"></table>
+    </section>
+  </section>
+
+  <section id="panel-relays" role="tabpanel" aria-labelledby="tab-relays" hidden>
+    <div class="controls">
+      <div class="filters" role="group" aria-label="性別" style="margin-top:0">
+        <button type="button" class="filter" data-rgender="all" aria-pressed="true">全員</button>
+        <button type="button" class="filter" data-rgender="男子" aria-pressed="false">男子</button>
+        <button type="button" class="filter" data-rgender="女子" aria-pressed="false">女子</button>
+      </div>
+    </div>
+    <div class="status" aria-live="polite"><span>リレーは 100m（4人×25m）</span><span><strong id="relay-count">-</strong>チーム</span></div>
+    <div id="relay-list"></div>
+  </section>
+
+  <section class="meet-info" aria-label="この確認アプリについて">
+    <p>申込一覧（エントリー確認、2026-10-15 発行）の記載どおりです。区分（幼稚園生・8才以下・9〜10才・11才以上）は申込のときに選ばれた区分、年齢は大会当日（11月8日）の満年齢です。</p>
+    <p>板キック・背面キックは、申込一覧では「200m」と表示されています（自由形の欄＝板キック、背泳ぎの欄＝背面キック）。このアプリでは 25m に読み替えています。</p>
+    <p class="warning">申込一覧には性別の欄がないため、チームごとの並び（男子→女子の順）から判断しています。並びで分からなかった一部の選手は名前から判断しています。リレーのメンバーは申込一覧に載っていません。</p>
+    <details>
+      <summary>確認資料を開く</summary>
+      <div class="source-links">
+        <a href="https://www.kagoshima-swim.com/new/wp-content/uploads/2026/10/6b85095f7993b5c1a6579964797686e7.pdf" target="_blank" rel="noreferrer">エントリー確認（申込一覧）</a>
+        <a href="https://www.kagoshima-swim.com/new/wp-content/uploads/2026/10/b2c2b7475dd50e94ba0d7b3ac4495472.pdf" target="_blank" rel="noreferrer">大会要項（一次要項）</a>
+      </div>
+    </details>
+  </section>
+  <footer>エントリー確認用の非公式アプリです。競技順序・組・レーンは大会プログラムで確認してください。</footer>
+</main>
+
+<script type="application/json" id="entry-data">__DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById('entry-data').textContent);
+const CLS = DATA.classes;
+const EV = DATA.events;
+const rows = DATA.rows;
+// 全角半角をそろえ、カタカナをひらがなに寄せて比較する（ﾊﾗﾀﾞ・ハラダ・はらだ を同一視）
+const normalize = value => String(value).normalize('NFKC').replace(/[\s　]/g, '').toLowerCase()
+  .replace(/[ァ-ヶ]/g, char => String.fromCharCode(char.charCodeAt(0) - 0x60));
+const safe = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const evName = i => `${EV[i].name} ${EV[i].dist}`;
+const genderTag = g => `<span class="gender${g === '女子' ? ' women' : ''}">${safe(g)}</span>`;
+const clsKeys = Object.keys(CLS);
+const groupNote = team => DATA.bTeams.includes(team)
+  ? `<b>${safe(team)}</b> は B（開門 8:50・ウォーミングアップ 9:00〜9:30）`
+  : `<b>${safe(team)}</b> は A（開門 8:30・ウォーミングアップ 8:40〜9:10）`;
+
+rows.forEach(row => {
+  // 区切りに | を入れて、空白を詰めたあとに語どうしがくっつかないようにする
+  row.searchable = normalize(['', row.name, row.kana, row.team, row.teamKana, row.grade, ''].join('|'));
+});
+
+// ---- 表示の切り替え ----
+const tabs = [...document.querySelectorAll('.tab')];
+tabs.forEach(tab => tab.addEventListener('click', () => {
+  tabs.forEach(item => {
+    const on = item === tab;
+    item.setAttribute('aria-selected', String(on));
+    document.getElementById(item.getAttribute('aria-controls')).hidden = !on;
+  });
+}));
+
+function pressGroup(attr, onPick){
+  const buttons = () => document.querySelectorAll(`.filter[data-${attr}]`);
+  buttons().forEach(button => button.addEventListener('click', () => {
+    buttons().forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    onPick(button.dataset[attr]);
+  }));
+}
+document.querySelectorAll('.cls-select').forEach(select => {
+  select.innerHTML = '<option value="all">全区分</option>' + clsKeys.map(k => `<option value="${k}">${safe(CLS[k])}</option>`).join('');
+});
+
+// ---- 選手・チーム ----
+const query = document.getElementById('query');
+let gender = 'all', cls = 'all', team = 'all';
+const clsSelect = document.getElementById('cls');
+document.getElementById('team-chips').innerHTML =
+  `<button type="button" class="filter" data-team="all" aria-pressed="true">全チーム</button>` +
+  DATA.teams.map(t => `<button type="button" class="filter" data-team="${safe(t.name)}" aria-pressed="false">${safe(t.name)}<small>${t.people}</small></button>`).join('');
+
+function renderPeople(){
+  const terms = query.value.split(/[\s　]+/).map(normalize).filter(Boolean);
+  const found = rows.filter(row => {
+    if (gender !== 'all' && row.gender !== gender) return false;
+    if (team !== 'all' && row.team !== team) return false;
+    if (cls !== 'all' && !row.entries.some(e => e.cls === cls)) return false;
+    return terms.every(term => row.searchable.includes(term));
+  });
+  const shown = row => cls === 'all' ? row.entries : row.entries.filter(e => e.cls === cls);
+  document.getElementById('people-count').textContent = found.length.toLocaleString('ja-JP');
+  document.getElementById('entry-count').textContent = found.reduce((sum, row) => sum + shown(row).length, 0).toLocaleString('ja-JP');
+  document.getElementById('team-note').innerHTML = team === 'all' ? '' : groupNote(team);
+  document.getElementById('people').innerHTML = found.length ? found.map(row =>
+    `<article class="person"><div class="person-main"><div class="name">${safe(row.name)}<span class="kana">${safe(row.kana)}</span></div>` +
+    `<div class="meta">${safe(row.team)}・${safe(row.grade)}（${row.age}才）・No.${row.no}</div></div>${genderTag(row.gender)}` +
+    `<div class="races">${shown(row).map(e => `<div class="race"><span class="ev">${safe(evName(e.ev))}</span><span class="cls">${safe(CLS[e.cls])}</span><span class="time">${safe(e.time)}</span></div>`).join('')}</div></article>`
+  ).join('') : '<div class="empty">条件に合う選手はいません。</div>';
+}
+pressGroup('gender', v => { gender = v; renderPeople(); });
+clsSelect.addEventListener('change', () => { cls = clsSelect.value; renderPeople(); });
+pressGroup('team', v => { team = v; renderPeople(); });
+query.addEventListener('input', renderPeople);
+
+// ---- 種目 ----
+const eventSelect = document.getElementById('event');
+let egender = 'all', ecls = 'all';
+const eclsSelect = document.getElementById('ecls');
+const byEvent = EV.map(() => []);
+rows.forEach(row => row.entries.forEach(e => byEvent[e.ev].push({row, e})));
+byEvent.forEach(list => list.sort((a, b) => a.e.sec - b.e.sec || a.row.no - b.row.no));
+eventSelect.innerHTML = EV.map((ev, i) => `<option value="${i}">${safe(evName(i))}（${byEvent[i].length}名）</option>`).join('');
+eventSelect.value = String(EV.findIndex(ev => ev.name === '自由形' && ev.dist === '25m'));
+
+function renderEvent(){
+  const i = Number(eventSelect.value);
+  const groups = [];
+  clsKeys.filter(k => ecls === 'all' || k === ecls).forEach(k => ['男子', '女子'].filter(g => egender === 'all' || g === egender).forEach(g => {
+    const list = byEvent[i].filter(x => x.e.cls === k && x.row.gender === g);
+    if (list.length) groups.push({k, g, list});
+  }));
+  const total = groups.reduce((sum, grp) => sum + grp.list.length, 0);
+  document.getElementById('event-label').textContent = `${evName(i)}・エントリータイム順`;
+  document.getElementById('event-count').textContent = total.toLocaleString('ja-JP');
+  document.getElementById('event-list').innerHTML = groups.length ? groups.map(grp =>
+    `<div class="group-title ${grp.g === '女子' ? 'women' : 'men'}"><span>${safe(CLS[grp.k])} ${safe(grp.g)}</span><small>${grp.list.length}名</small></div>` +
+    `<div class="rank-list">${grp.list.map((x, n) => `<div class="rank"><span class="pos">${n + 1}</span><div class="who"><strong>${safe(x.row.name)}</strong><span>${safe(x.row.team)}・${safe(x.row.grade)}（${x.row.age}才）</span></div><span class="time">${safe(x.e.time)}</span></div>`).join('')}</div>`
+  ).join('') : '<div class="empty">この条件のエントリーはありません。</div>';
+}
+function renderMatrix(){
+  const head = `<tr><th>種目</th>${clsKeys.map(k => `<th>${safe(CLS[k])}</th>`).join('')}</tr>`;
+  const body = EV.map((ev, i) => `<tr><td>${safe(evName(i))}</td>${clsKeys.map(k => {
+    const n = byEvent[i].filter(x => x.e.cls === k).length;
+    return `<td><button type="button" data-ev="${i}" data-k="${k}" ${n ? '' : 'disabled'} aria-label="${safe(evName(i))} ${safe(CLS[k])} ${n}名">${n || '-'}</button></td>`;
+  }).join('')}</tr>`).join('');
+  const matrix = document.getElementById('matrix');
+  matrix.innerHTML = `<thead>${head}</thead><tbody>${body}</tbody>`;
+  matrix.addEventListener('click', event => {
+    const button = event.target.closest('button[data-ev]');
+    if (!button) return;
+    eventSelect.value = button.dataset.ev;
+    eclsSelect.value = ecls = button.dataset.k;
+    renderEvent();
+    document.getElementById('panel-events').scrollIntoView({behavior: 'smooth'});
+  });
+}
+pressGroup('egender', v => { egender = v; renderEvent(); });
+eclsSelect.addEventListener('change', () => { ecls = eclsSelect.value; renderEvent(); });
+eventSelect.addEventListener('change', renderEvent);
+
+// ---- リレー ----
+let rgender = 'all';
+function renderRelays(){
+  const groups = [];
+  ['フリーリレー', 'メドレーリレー'].forEach(name => clsKeys.forEach(k => ['男子', '女子'].filter(g => rgender === 'all' || g === rgender).forEach(g => {
+    const list = DATA.relays.filter(r => r.event === name && r.cls === k && r.gender === g).sort((a, b) => a.sec - b.sec);
+    if (list.length) groups.push({name, k, g, list});
+  })));
+  document.getElementById('relay-count').textContent = groups.reduce((sum, grp) => sum + grp.list.length, 0);
+  document.getElementById('relay-list').innerHTML = groups.map(grp =>
+    `<div class="group-title ${grp.g === '女子' ? 'women' : 'men'}"><span>${safe(grp.name)} ${safe(CLS[grp.k])} ${safe(grp.g)}</span><small>${grp.list.length}チーム</small></div>` +
+    `<div class="rank-list">${grp.list.map((r, n) => `<div class="rank"><span class="pos">${n + 1}</span><div class="who"><strong>${safe(r.team)}</strong><span>${safe(r.dist)}</span></div><span class="time">${safe(r.time)}</span></div>`).join('')}</div>`
+  ).join('');
+}
+pressGroup('rgender', v => { rgender = v; renderRelays(); });
+
+renderPeople();
+renderEvent();
+renderMatrix();
+renderRelays();
+</script>
+</body>
+</html>
