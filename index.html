@@ -6,7 +6,9 @@
   <meta name="theme-color" content="#10182f">
   <title>チャレンジ大会 エントリー確認</title>
   <style>
-    :root{--bg:#10182f;--panel:#182442;--panel2:#202f52;--text:#f4f8ff;--muted:#afbdd7;--accent:#00c4ff;--gold:#ffd766;--line:#30436c;--women:#ffadd8;--men:#9ceaff}
+    :root{--bg:#10182f;--panel:#182442;--panel2:#202f52;--text:#f4f8ff;--muted:#afbdd7;--accent:#00c4ff;--gold:#ffd766;--line:#30436c;
+      /* 男女色（毎回固定・変更禁止） */
+      --male:#1565c0;--female:#b71c6e;--maleText:#6fb7ff;--femaleText:#ff92c2}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;min-height:100vh;-webkit-text-size-adjust:100%}
     main{width:min(820px,100%);margin:auto;padding:calc(16px + env(safe-area-inset-top)) 16px 32px}
@@ -36,6 +38,8 @@
     .filters{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
     .filter{min-height:38px;border:1px solid #405782;border-radius:6px;background:var(--panel);color:#e3ecfb;padding:6px 11px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
     .filter[aria-pressed="true"]{border-color:var(--accent);background:#0b3650;color:#fff}
+    .filter.m[aria-pressed="true"]{background:var(--male);border-color:var(--maleText)}
+    .filter.f[aria-pressed="true"]{background:var(--female);border-color:var(--femaleText)}
     .chips{display:flex;gap:7px;overflow-x:auto;margin-top:8px;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
     .chips::-webkit-scrollbar{display:none}
     .chips .filter{flex:none;white-space:nowrap}
@@ -45,13 +49,15 @@
     .team-note{margin:-2px 0 9px;padding:8px 10px;border-left:3px solid var(--accent);background:var(--panel);font-size:12px;line-height:1.5;color:#d1ddef}
     .team-note:empty{display:none}
     .list{display:grid;gap:7px}
-    .person{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;padding:11px 12px;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+    .person{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;padding:11px 12px 11px 15px;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+    .person::before,.rank::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--male)}
+    .person.f::before,.rank.f::before{background:var(--female)}
     .person-main{min-width:0}
     .name{font-size:17px;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
     .kana{color:#aebbd5;font-size:11px;font-weight:500;margin-left:5px}
     .meta{margin-top:3px;color:var(--muted);font-size:12px;line-height:1.45;overflow-wrap:anywhere}
-    .gender{align-self:start;border:1px solid #64dfff66;border-radius:4px;padding:4px 7px;color:var(--men);font-size:11px;font-weight:800;white-space:nowrap}
-    .gender.women{border-color:#ff8ccf66;color:var(--women)}
+    .gender{align-self:start;border-radius:5px;padding:3px 8px;background:var(--male);color:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+    .gender.f{background:var(--female)}
     .races{grid-column:1/-1;display:grid;gap:5px}
     .race{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;background:var(--panel2);font-size:13px}
     .race .ev{font-weight:800}
@@ -59,11 +65,11 @@
     .race .time{margin-left:auto;color:var(--accent);font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
     .group-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:16px 0 7px;padding-bottom:6px;border-bottom:2px solid var(--line);font-size:15px;font-weight:800}
     .group-title:first-child{margin-top:4px}
-    .group-title.men{border-color:#64dfff88}
-    .group-title.women{border-color:#ff8ccf88}
+    .group-title.m{color:var(--maleText);border-color:var(--male)}
+    .group-title.f{color:var(--femaleText);border-color:var(--female)}
     .group-title small{color:var(--muted);font-size:12px;font-weight:700;white-space:nowrap}
     .rank-list{display:grid;gap:5px}
-    .rank{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+    .rank{position:relative;overflow:hidden;display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 10px 8px 13px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
     .rank .pos{color:var(--muted);font-size:12px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
     .rank .who{min-width:0}
     .rank .who strong{display:block;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
@@ -120,8 +126,8 @@
       </div>
       <div class="filters" role="group" aria-label="性別">
         <button type="button" class="filter" data-gender="all" aria-pressed="true">全員</button>
-        <button type="button" class="filter" data-gender="男子" aria-pressed="false">男子</button>
-        <button type="button" class="filter" data-gender="女子" aria-pressed="false">女子</button>
+        <button type="button" class="filter m" data-gender="男子" aria-pressed="false">男子</button>
+        <button type="button" class="filter f" data-gender="女子" aria-pressed="false">女子</button>
       </div>
       <div class="chips" id="team-chips" role="group" aria-label="チーム"></div>
     </div>
@@ -138,8 +144,8 @@
       </div>
       <div class="filters" role="group" aria-label="性別">
         <button type="button" class="filter" data-egender="all" aria-pressed="true">全員</button>
-        <button type="button" class="filter" data-egender="男子" aria-pressed="false">男子</button>
-        <button type="button" class="filter" data-egender="女子" aria-pressed="false">女子</button>
+        <button type="button" class="filter m" data-egender="男子" aria-pressed="false">男子</button>
+        <button type="button" class="filter f" data-egender="女子" aria-pressed="false">女子</button>
       </div>
     </div>
     <div class="status" aria-live="polite"><span id="event-label"></span><span><strong id="event-count">-</strong>名</span></div>
@@ -154,8 +160,8 @@
     <div class="controls">
       <div class="filters" role="group" aria-label="性別" style="margin-top:0">
         <button type="button" class="filter" data-rgender="all" aria-pressed="true">全員</button>
-        <button type="button" class="filter" data-rgender="男子" aria-pressed="false">男子</button>
-        <button type="button" class="filter" data-rgender="女子" aria-pressed="false">女子</button>
+        <button type="button" class="filter m" data-rgender="男子" aria-pressed="false">男子</button>
+        <button type="button" class="filter f" data-rgender="女子" aria-pressed="false">女子</button>
       </div>
     </div>
     <div class="status" aria-live="polite"><span>リレーは 100m（4人×25m）</span><span><strong id="relay-count">-</strong>チーム</span></div>
@@ -188,7 +194,8 @@ const normalize = value => String(value).normalize('NFKC').replace(/[\s　]/g, '
   .replace(/[ァ-ヶ]/g, char => String.fromCharCode(char.charCodeAt(0) - 0x60));
 const safe = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const evName = i => `${EV[i].name} ${EV[i].dist}`;
-const genderTag = g => `<span class="gender${g === '女子' ? ' women' : ''}">${safe(g)}</span>`;
+const gcls = g => g === '女子' ? 'f' : 'm';
+const genderTag = g => `<span class="gender ${gcls(g)}">${safe(g)}</span>`;
 const clsKeys = Object.keys(CLS);
 const groupNote = team => DATA.bTeams.includes(team)
   ? `<b>${safe(team)}</b> は B（開門 8:50・ウォーミングアップ 9:00〜9:30）`
@@ -241,7 +248,7 @@ function renderPeople(){
   document.getElementById('entry-count').textContent = found.reduce((sum, row) => sum + shown(row).length, 0).toLocaleString('ja-JP');
   document.getElementById('team-note').innerHTML = team === 'all' ? '' : groupNote(team);
   document.getElementById('people').innerHTML = found.length ? found.map(row =>
-    `<article class="person"><div class="person-main"><div class="name">${safe(row.name)}<span class="kana">${safe(row.kana)}</span></div>` +
+    `<article class="person ${gcls(row.gender)}"><div class="person-main"><div class="name">${safe(row.name)}<span class="kana">${safe(row.kana)}</span></div>` +
     `<div class="meta">${safe(row.team)}・${safe(row.grade)}（${row.age}才）・No.${row.no}</div></div>${genderTag(row.gender)}` +
     `<div class="races">${shown(row).map(e => `<div class="race"><span class="ev">${safe(evName(e.ev))}</span><span class="cls">${safe(CLS[e.cls])}</span><span class="time">${safe(e.time)}</span></div>`).join('')}</div></article>`
   ).join('') : '<div class="empty">条件に合う選手はいません。</div>';
@@ -272,8 +279,8 @@ function renderEvent(){
   document.getElementById('event-label').textContent = `${evName(i)}・エントリータイム順`;
   document.getElementById('event-count').textContent = total.toLocaleString('ja-JP');
   document.getElementById('event-list').innerHTML = groups.length ? groups.map(grp =>
-    `<div class="group-title ${grp.g === '女子' ? 'women' : 'men'}"><span>${safe(CLS[grp.k])} ${safe(grp.g)}</span><small>${grp.list.length}名</small></div>` +
-    `<div class="rank-list">${grp.list.map((x, n) => `<div class="rank"><span class="pos">${n + 1}</span><div class="who"><strong>${safe(x.row.name)}</strong><span>${safe(x.row.team)}・${safe(x.row.grade)}（${x.row.age}才）</span></div><span class="time">${safe(x.e.time)}</span></div>`).join('')}</div>`
+    `<div class="group-title ${gcls(grp.g)}"><span>${safe(CLS[grp.k])} ${safe(grp.g)}</span><small>${grp.list.length}名</small></div>` +
+    `<div class="rank-list">${grp.list.map((x, n) => `<div class="rank ${gcls(grp.g)}"><span class="pos">${n + 1}</span><div class="who"><strong>${safe(x.row.name)}</strong><span>${safe(x.row.team)}・${safe(x.row.grade)}（${x.row.age}才）</span></div><span class="time">${safe(x.e.time)}</span></div>`).join('')}</div>`
   ).join('') : '<div class="empty">この条件のエントリーはありません。</div>';
 }
 function renderMatrix(){
@@ -307,8 +314,8 @@ function renderRelays(){
   })));
   document.getElementById('relay-count').textContent = groups.reduce((sum, grp) => sum + grp.list.length, 0);
   document.getElementById('relay-list').innerHTML = groups.map(grp =>
-    `<div class="group-title ${grp.g === '女子' ? 'women' : 'men'}"><span>${safe(grp.name)} ${safe(CLS[grp.k])} ${safe(grp.g)}</span><small>${grp.list.length}チーム</small></div>` +
-    `<div class="rank-list">${grp.list.map((r, n) => `<div class="rank"><span class="pos">${n + 1}</span><div class="who"><strong>${safe(r.team)}</strong><span>${safe(r.dist)}</span></div><span class="time">${safe(r.time)}</span></div>`).join('')}</div>`
+    `<div class="group-title ${gcls(grp.g)}"><span>${safe(grp.name)} ${safe(CLS[grp.k])} ${safe(grp.g)}</span><small>${grp.list.length}チーム</small></div>` +
+    `<div class="rank-list">${grp.list.map((r, n) => `<div class="rank ${gcls(grp.g)}"><span class="pos">${n + 1}</span><div class="who"><strong>${safe(r.team)}</strong><span>${safe(r.dist)}</span></div><span class="time">${safe(r.time)}</span></div>`).join('')}</div>`
   ).join('');
 }
 pressGroup('rgender', v => { rgender = v; renderRelays(); });
